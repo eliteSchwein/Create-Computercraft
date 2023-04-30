@@ -4,6 +4,7 @@
 --- DateTime: 30.04.2023 22:00
 ---
 
+local config = require("config")
 local displays = config["displays"]
 
 term.write("Elevator OS 1.0 - Touch")
