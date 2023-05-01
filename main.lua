@@ -10,10 +10,13 @@ local displays = config["displays"]
 local upSensor = config["upSensor"]
 local downSensor = config["downSensor"]
 local clutchOut = config["clutchOut"]
+local labels = config["labels"]
 local gearOut = config["gearOut"]
 local currentFloor = 0
 local isMoving = false
-local targetFloor = -1
+local targetFloor = 0
+local lastFloor = 0
+local lastFloorLabel = ""
 
 term.write("Elevator OS 1.0 - Core")
 
@@ -61,6 +64,7 @@ function scanSensors ()
         goFloor(touchInput)
     end
 end
+
 function checkInvertedSensor(sensor)
     local firstItem = sensor.getItemDetail(1)
     if not firstItem then
@@ -69,6 +73,7 @@ function checkInvertedSensor(sensor)
 
     return false
 end
+
 function scanSensor(index)
     if(peripheral.isPresent(sensors[index]) == false) then
         print("sensor " .. index .. " is missing, skipping!")
@@ -91,35 +96,91 @@ end
 
 --- monitor function
 function updateMonitors()
+    local floor = "F: "..targetFloor
+    local label = labels[targetFloor]
+
+    local floorColor = "87f"
+    local floorBackground = "fff"
+
+    if currentFloor > 0 then
+        lastFloor = currentFloor
+    end
+
+    if isMoving == true then
+        floor = "F: "..lastFloor..">"..targetFloor
+
+        if lastFloor > 9 then
+            floorColor = floorColor.."33"
+            floorBackground = floorBackground.."ff"
+        else
+            floorColor = floorColor.."3"
+            floorBackground = floorBackground.."f"
+        end
+
+        floorColor = floorColor.."7"
+        floorBackground = floorBackground.."f"
+    end
+
+    if floor == lastFloorLabel then
+        return
+    end
+
+    lastFloorLabel = floor
+
+    if label == nil then
+        label = "N/A"
+    else
+        label = ""..label
+    end
+
+    if targetFloor > 9 then
+        floorColor = floorColor.."99"
+        floorBackground = floorBackground.."ff"
+    else
+        floorColor = floorColor.."9"
+        floorBackground = floorBackground.."f"
+    end
+
     for index = 1, #(displays) do
         local display = peripheral.wrap(displays[index])
+
         display.clear()
         display.setBackgroundColor(colors.black)
         display.setTextScale(1)
 
         display.setCursorPos(1,5)
 
+        if isMoving then
+            display.blit("is busy","fffffff","1111111")
+        end
+
         if currentFloor ~= index and isMoving == false then
             display.blit("call me","fffffff","9999999")
         end
 
-        if isMoving then
-            display.blit("is busy","fffffff","9999999")
+        if currentFloor == index and isMoving == false then
+            display.blit("is here","fffffff","ddddddd")
         end
-
-        display.setCursorPos(1,3)
 
         local x,y = display.getSize()
         local x2,y2 = display.getCursorPos()
-        local text = "..."
+
+        display.setTextColor(colors.gray)
+        display.setCursorPos(1, 2)
 
         if isMoving == false then
-            text = ""..currentFloor
+            display.write("")
+            display.setCursorPos(1, 2)
+        else
+            display.write("> ")
+            display.setCursorPos(3, 2)
         end
 
         display.setTextColor(colors.cyan)
-        display.setCursorPos(math.round((x / 2) - (text:len() / 2)) + 1, y2)
-        display.write(text)
+        display.write(label)
+        display.setTextColor(colors.blue)
+        display.setCursorPos(1, 3)
+        display.blit(floor, floorColor, floorBackground)
     end
 end
 
