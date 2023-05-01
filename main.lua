@@ -121,10 +121,6 @@ function updateMonitors()
         floorBackground = floorBackground.."f"
     end
 
-    if floor == lastFloorLabel then
-        return
-    end
-
     lastFloorLabel = floor
 
     if label == nil then
