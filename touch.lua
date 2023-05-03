@@ -6,6 +6,7 @@
 
 local config = require("config")
 local displays = config["displays"]
+local name = config["name"]
 
 term.write("Elevator OS 1.0 - Touch")
 

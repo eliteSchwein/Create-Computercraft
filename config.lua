@@ -8,6 +8,7 @@ return {
     displays = {"monitor_1","monitor_2","monitor_0","monitor_4","monitor_3"},
     sensors = {"minecraft:dropper_21","minecraft:dropper_20","minecraft:dropper_19","minecraft:dropper_26","minecraft:dropper_13"},
     labels = {"Floor","ME Core","Train","Power","Top"},
+    name = "elevator_1",
     upSensor = "minecraft:dropper_24",
     downSensor = "minecraft:dropper_25",
     clutchOut = "computer_5",
