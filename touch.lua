@@ -7,7 +7,6 @@
 local config = require("config")
 local displays = config["displays"]
 local name = config["name"]
-local wirelessModem = peripheral.call("right", "open", config["wirelessPort"])
 
 term.write("Elevator OS 1.0 - Touch")
 
@@ -32,6 +31,9 @@ function modemReceive(event, modemSide, senderChannel, replyChannel, message, se
     os.sleep(1)
     rs.setOutput("left", false)
 end
+
+peripheral.call("right", "open", config["wirelessPort"])
+peripheral.call("top", "open", config["wirelessPort"])
 
 while true do
     local event, param1, param2, param3, param4, param5 = os.pullEvent()
