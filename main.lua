@@ -12,7 +12,6 @@ local downSensor = config["downSensor"]
 local clutchOut = config["clutchOut"]
 local labels = config["labels"]
 local gearOut = config["gearOut"]
-local name = config["name"]
 local currentFloor = 0
 local isMoving = false
 local targetFloor = 0
@@ -59,6 +58,10 @@ function scanSensors ()
     if checkInvertedSensor(downSensorPeri) then
         goFloor(currentFloor - 1)
     end
+
+    if touchInput > 0 and touchInput ~= currentFloor then
+        goFloor(touchInput)
+    end
 end
 
 function checkInvertedSensor(sensor)
@@ -72,14 +75,18 @@ end
 
 function scanSensor(index)
     if(peripheral.isPresent(sensors[index]) == false) then
+        print("sensor " .. index .. " is missing, skipping!")
         return false
     end
 
     local sensor = peripheral.wrap(sensors[index])
     local firstItem = sensor.getItemDetail(1)
     if not firstItem then
+        ---print("sensor " .. index .. " is empty, skipping!")
         return false
     end
+
+    --print("sensor "..index.." got triggered!")
 
     return true
 end
@@ -111,10 +118,6 @@ function updateMonitors()
 
         floorColor = floorColor.."7"
         floorBackground = floorBackground.."f"
-    end
-
-    if lastFloorLabel == floor then
-        return
     end
 
     lastFloorLabel = floor
@@ -153,6 +156,9 @@ function updateMonitors()
         if currentFloor == index and isMoving == false then
             display.blit("is here","fffffff","ddddddd")
         end
+
+        local x,y = display.getSize()
+        local x2,y2 = display.getCursorPos()
 
         display.setTextColor(colors.gray)
         display.setCursorPos(1, 2)

@@ -12,5 +12,6 @@ return {
     upSensor = "minecraft:dropper_24",
     downSensor = "minecraft:dropper_25",
     clutchOut = "computer_10",
-    gearOut = "computer_9"
+    gearOut = "computer_9",
+    wirelessPort = 27701
 }
