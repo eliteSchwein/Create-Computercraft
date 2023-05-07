@@ -5,11 +5,11 @@
 ---
 
 return {
-    displays = {"monitor_1","monitor_2","monitor_0","monitor_4","monitor_3","monitor_5"},
-    sensors = {"minecraft:dropper_21","minecraft:dropper_20","minecraft:dropper_19","minecraft:dropper_26","minecraft:dropper_13","minecraft:dropper_27"},
-    labels = {"Floor","ME Core","Train","Power","Top","Exit"},
+    displays = {"monitor_1","monitor_2","monitor_0","monitor_4","monitor_3"},
+    sensors = {"minecraft:dropper_21","minecraft:dropper_20","minecraft:dropper_19","minecraft:dropper_26","minecraft:dropper_13"},
+    labels = {"Floor","ME Core","Train","Power","Top"},
     upSensor = "minecraft:dropper_24",
     downSensor = "minecraft:dropper_25",
-    clutchOut = "computer_10",
-    gearOut = "computer_9"
+    clutchOut = "computer_5",
+    gearOut = "computer_4"
 }
