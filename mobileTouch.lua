@@ -5,7 +5,93 @@
 ---
 ---
 local config = require("config")
+local displays = config["displays"]
+local name = config["name"]
+local wirelessPort = config["wirelessPort"]
+local labels = config["labels"]
+local wirelessModem = peripheral.wrap("top")
+local currentPage = 1
+local pageEntries = 3
+local maxPages = math.ceil(#(labels) / pageEntries)
+local display = peripheral.wrap("left")
 
-peripheral.call("left", "open", config["wirelessPort"])
+term.write("Elevator OS 1.0 - Mobile Touch")
 
-peripheral.call("left", "transmit", config["wirelessPort"], 1, 3)
+
+
+--- monitor touch function
+function touchMonitor(event, side, xPos, yPos)
+    if yPos == 5 then
+        updateScreen(true)
+        return
+    end
+
+    if yPos == 1 then
+        updateScreen(false)
+        return
+    end
+
+    local index = (maxPages * pageEntries - ((currentPage - 1) * pageEntries)) - yPos + 2
+
+    if index < 1 then
+        return
+    end
+
+    wirelessModem.transmit(config["wirelessPort"],config["wirelessPort"],index)
+end
+
+
+
+--- render screen function
+
+function updateScreen(pageUp)
+    if pageUp == nil then
+        pageUp = false
+    end
+
+    if pageUp == true and currentPage < maxPages then
+        currentPage = currentPage + 1
+    end
+    if pageUp == false and currentPage > 1 then
+        currentPage = currentPage - 1
+    end
+
+    display.clear()
+    display.setBackgroundColor(colors.black)
+    display.setTextScale(1)
+
+    if currentPage ~= 1 then
+        display.setCursorPos(4,1)
+        display.setTextColor(colors.gray)
+        display.write("\30")
+    end
+
+    if currentPage ~= maxPages then
+        display.setCursorPos(4,5)
+        display.setTextColor(colors.gray)
+        display.write("\31")
+    end
+
+    for pageEntry = 1, pageEntries do
+        local index = (maxPages * pageEntries - ((currentPage - 1) * pageEntries)) - pageEntry + 1
+        local label = labels[index]
+
+        if label ~= nil then
+            display.setTextColor(colors.cyan)
+            display.setCursorPos(1, pageEntry + 1)
+            display.write(label)
+        end
+    end
+end
+
+wirelessModem.open(wirelessPort)
+
+updateScreen()
+
+while true do
+    local event, param1, param2, param3, param4, param5 = os.pullEvent()
+
+    if(event == "monitor_touch") then
+        touchMonitor(event, param1, param2, param3)
+    end
+end

@@ -22,13 +22,6 @@ term.write("Elevator OS 1.0 - Core")
 
 
 
---- fix lua missing round
-math.round = function(n)
-    return math.floor(n + 0.5)
-end
-
-
-
 --- Elevator Sensor Scans
 function scanSensors ()
     local isSensorTriggered = false
