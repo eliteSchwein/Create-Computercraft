@@ -7,9 +7,9 @@
 local config = require("config")
 local sensors = config["sensors"]
 local displays = config["displays"]
-local upSensor = config["upSensor"]
-local downSensor = config["downSensor"]
 local clutchOut = config["clutchOut"]
+local wirelessPort = config["wirelessPort"]
+local wiredModem = peripheral.wrap("top")
 local labels = config["labels"]
 local gearOut = config["gearOut"]
 local currentFloor = 0
@@ -17,6 +17,8 @@ local isMoving = false
 local targetFloor = 0
 local lastFloor = 0
 local lastFloorLabel = ""
+local watchdogTimer = 0
+local watchdogIsMoving = false
 
 term.write("Elevator OS 1.0 - Core")
 
@@ -25,8 +27,7 @@ term.write("Elevator OS 1.0 - Core")
 --- Elevator Sensor Scans
 function scanSensors ()
     local isSensorTriggered = false
-    local upSensorPeri = peripheral.wrap(upSensor)
-    local downSensorPeri = peripheral.wrap(downSensor)
+    local touchInput = rs.getAnalogueInput("right")
 
     for index = 1, #(sensors) do
         local sensorTriggered = scanSensor(index)
@@ -42,14 +43,6 @@ function scanSensors ()
         goFloor(#(sensors))
     else
         checkPosition()
-    end
-
-    if checkInvertedSensor(upSensorPeri) then
-        goFloor(currentFloor + 1)
-    end
-
-    if checkInvertedSensor(downSensorPeri) then
-        goFloor(currentFloor - 1)
     end
 
     if touchInput > 0 and touchInput ~= currentFloor then
@@ -284,6 +277,24 @@ end
 
 
 
+--- watchdog code
+function watchdog()
+    watchdogTimer = watchdogTimer+1
+
+    if watchdogIsMoving ~= isMoving then
+        watchdogTimer = 0
+        watchdogIsMoving = isMoving
+        return
+    end
+
+    if watchdogTimer == 3600 then
+        wiredModem.transmit(wirelessPort, wirelessPort, "reboot")
+        os.reboot()
+    end
+end
+
+
+
 --- init
 if isClutchEngaged() == false then
     toggleClutch()
@@ -301,4 +312,5 @@ goFloor(#(sensors))
 while true do
     scanSensors()
     updateMonitors()
+    watchdog()
 end

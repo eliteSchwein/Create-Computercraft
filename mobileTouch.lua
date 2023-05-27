@@ -83,6 +83,16 @@ function updateScreen(pageUp)
     end
 end
 
+
+
+--- remote access function
+
+function modemReceive(event, modemSide, senderChannel, replyChannel, message, senderDistance)
+    if message == 'reboot' then
+        os.reboot()
+    end
+end
+
 wirelessModem.open(receiveWirelessPort)
 
 updateScreen()
@@ -94,5 +104,7 @@ while true do
         touchMonitor(event, param1, param2, param3)
     end
 
-    print(event)
+    if(event == "modem_message") then
+        modemReceive(event, param1, param2, param3, param4, param5)
+    end
 end

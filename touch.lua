@@ -7,6 +7,9 @@
 local config = require("config")
 local displays = config["displays"]
 local name = config["name"]
+local wiredModem = peripheral.wrap("top")
+local wirelessModem = peripheral.wrap("right")
+local remotePort = config["wirelessPort"]+1
 
 term.write("Elevator OS 1.0 - Touch")
 
@@ -27,13 +30,18 @@ function modemReceive(event, modemSide, senderChannel, replyChannel, message, se
         return
     end
 
+    if message == 'reboot' then
+        wirelessModem.transmit(remotePort, remotePort, "reboot")
+        os.reboot()
+    end
+
     rs.setAnalogueOutput("left", tonumber(message))
     os.sleep(1)
     rs.setOutput("left", false)
 end
 
-peripheral.call("right", "open", config["wirelessPort"])
-peripheral.call("top", "open", config["wirelessPort"])
+wirelessModem.open(config["wirelessPort"])
+wiredModem.open(config["wirelessPort"])
 
 while true do
     local event, param1, param2, param3, param4, param5 = os.pullEvent()

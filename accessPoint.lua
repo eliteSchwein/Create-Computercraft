@@ -6,6 +6,8 @@
 
 local config = require("config")
 local wiredModem = peripheral.wrap("bottom")
+local wirelessModem = peripheral.wrap("right")
+local remotePort = config["wirelessPort"]+1
 
 term.write("Elevator OS 1.0 - Access Point")
 
@@ -14,11 +16,15 @@ function modemReceive(event, modemSide, senderChannel, replyChannel, message, se
         return
     end
 
+    if message == 'reboot' then
+        wirelessModem.transmit(remotePort, remotePort, "reboot")
+        os.reboot()
+    end
+
     wiredModem.transmit(config["wirelessPort"], replyChannel, message)
 end
 
-peripheral.call("right", "open", config["wirelessPort"])
-
+wirelessModem.open(config["wirelessPort"])
 wiredModem.open(config["wirelessPort"])
 
 while true do
