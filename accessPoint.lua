@@ -14,7 +14,7 @@ function modemReceive(event, modemSide, senderChannel, replyChannel, message, se
         return
     end
 
-    wiredModem.transmit(config["wirelessPort"], config["wirelessPort"], message)
+    wiredModem.transmit(config["wirelessPort"], replyChannel, message)
 end
 
 peripheral.call("right", "open", config["wirelessPort"])

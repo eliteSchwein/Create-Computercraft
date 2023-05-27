@@ -5,9 +5,8 @@
 ---
 ---
 local config = require("config")
-local displays = config["displays"]
-local name = config["name"]
 local wirelessPort = config["wirelessPort"]
+local receiveWirelessPort = wirelessPort + 1
 local labels = config["labels"]
 local wirelessModem = peripheral.wrap("bottom")
 local currentPage = 1
@@ -37,7 +36,7 @@ function touchMonitor(event, side, xPos, yPos)
         return
     end
 
-    wirelessModem.transmit(config["wirelessPort"],config["wirelessPort"],index)
+    wirelessModem.transmit(config["wirelessPort"], receiveWirelessPort, index)
 end
 
 
@@ -84,7 +83,7 @@ function updateScreen(pageUp)
     end
 end
 
-wirelessModem.open(wirelessPort)
+wirelessModem.open(receiveWirelessPort)
 
 updateScreen()
 
@@ -94,4 +93,6 @@ while true do
     if(event == "monitor_touch") then
         touchMonitor(event, param1, param2, param3)
     end
+
+    print(event)
 end
