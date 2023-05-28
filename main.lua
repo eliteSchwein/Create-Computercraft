@@ -287,7 +287,7 @@ function watchdog()
         return
     end
 
-    if watchdogTimer == 3600 then
+    if watchdogTimer == 600 then
         wiredModem.transmit(wirelessPort, wirelessPort, "reboot")
         os.reboot()
     end
